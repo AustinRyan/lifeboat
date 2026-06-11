@@ -44,8 +44,8 @@ STAMP="$REPO/ops/.last-deploy"
 HEAD_NOW="$(git rev-parse HEAD)"
 if [ ! -f "$STAMP" ] || [ "$(cat "$STAMP")" != "$HEAD_NOW" ]; then
   ( cd site \
-    && SITE_URL="https://austinryan.github.io/lifeboat/" BASE_PATH="/lifeboat" npm run build >/dev/null 2>&1 \
-    && npx gh-pages -d dist --nojekyll -m "deploy site" >/dev/null 2>&1 ) \
+    && SITE_URL="https://austinryan.github.io/lifeboat/" BASE_PATH="/lifeboat" npm run build 2>&1 | tail -2 \
+    && npx gh-pages -d dist --nojekyll -m "deploy site" 2>&1 | tail -2 ) \
     && { echo "$HEAD_NOW" > "$STAMP"; echo "site deployed"; } \
     || echo "site deploy failed"
 fi
