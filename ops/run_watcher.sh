@@ -42,10 +42,12 @@ if ! git diff --quiet || ! git diff --cached --quiet || [ -n "$(git status --por
   git push --quiet && echo "pushed state"
 fi
 
-# Rebuild + publish the site when content or signals changed since last deploy.
+# Rebuild + publish the site when content changed since last deploy, or at
+# least daily so build-time countdowns and deadline-based statuses stay fresh.
 STAMP="$REPO/ops/.last-deploy"
 HEAD_NOW="$(git rev-parse HEAD)"
-if [ ! -f "$STAMP" ] || [ "$(cat "$STAMP")" != "$HEAD_NOW" ]; then
+if [ ! -f "$STAMP" ] || [ "$(cat "$STAMP")" != "$HEAD_NOW" ] \
+   || [ -n "$(find "$STAMP" -mmin +1440 2>/dev/null)" ]; then
   ( cd site \
     && SITE_URL="https://austinryan.github.io/lifeboat/" BASE_PATH="/lifeboat" npm run build 2>&1 | tail -2 \
     && npx gh-pages -d dist --nojekyll -m "deploy site" 2>&1 | tail -2 ) \

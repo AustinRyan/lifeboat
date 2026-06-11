@@ -13,6 +13,8 @@ const { event } = Astro.props;
 const { Content } = await render(event);
 const d = event.data;
 const daysLeft = d.deadline ? daysUntil(d.deadline) : null;
+// status flips to sunk automatically once the deadline passes a daily rebuild
+const status = daysLeft !== null && daysLeft < 0 ? 'sunk' : d.status;
 const resolved = d.alternatives.map((alt) => ({ ...alt, link: resolveLink(alt.url, alt.affiliateKey) }));
 const anySponsored = resolved.some((alt) => alt.link.sponsored);
 ---
@@ -33,7 +35,7 @@ const anySponsored = resolved.some((alt) => alt.link.sponsored);
     <div class="factbox rise d3">
       <dl>
         <dt>Status</dt>
-        <dd><span class={`badge ${d.status}`}>{d.status === 'sinking' ? 'Sinking' : 'Sunk'}</span></dd>
+        <dd><span class={`badge ${status}`}>{status === 'sinking' ? 'Sinking' : 'Sunk'}</span></dd>
         <dt>Service ends</dt>
         <dd>
           <strong>{fmtDate(d.deadline)}</strong>

@@ -7,8 +7,11 @@ import signals from '../data/signals.json';
 const events = (await getCollection('events')).sort(
   (a, b) => (b.data.deadline ?? b.data.announced).localeCompare(a.data.deadline ?? a.data.announced),
 );
-const sinking = events.filter((e) => e.data.status === 'sinking');
-const sunk = events.filter((e) => e.data.status === 'sunk');
+// past-deadline guides count as sunk automatically, whatever their frontmatter says
+const effectiveStatus = (e) =>
+  e.data.deadline && daysUntil(e.data.deadline) < 0 ? 'sunk' : e.data.status;
+const sinking = events.filter((e) => effectiveStatus(e) === 'sinking');
+const sunk = events.filter((e) => effectiveStatus(e) === 'sunk');
 const recentSignals = signals.slice(0, 6);
 const buildDate = new Date().toISOString().slice(0, 10);
 const base = import.meta.env.BASE_URL.replace(/\/+$/, '');
