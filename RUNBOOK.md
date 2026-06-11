@@ -1,89 +1,71 @@
 # Lifeboat Runbook
 
-The system is built and verified. These are the steps only a human (Austin)
-can do, in order. Steps 0–2 take ~20 minutes total; after them the machine
-runs itself.
+## Current state: fully automated, zero required maintenance
 
-## 0. Push the repo (one-time, ~2 min) — REQUIRED FIRST
+- **Watcher**: runs on this Mac every 30 minutes via launchd
+  (`~/Library/LaunchAgents/com.austinryan.lifeboat-watcher.plist` →
+  `ops/run_watcher.sh`). It polls sources, commits state, pushes, and opens a
+  `shutdown-alert` GitHub Issue per new detection. Logs:
+  `ops/logs/watcher.log`. It only runs while the Mac is awake — detections
+  queue up and are caught on the next run.
+- **Site**: deployed to **https://austinryan.github.io/lifeboat/** via the
+  `gh-pages` branch; the watcher redeploys automatically when content changes.
+- **Alerts**: watch the repo (GitHub → Watch → All activity) to get
+  emails/push notifications when an issue opens.
 
-The repo `AustinRyan/lifeboat` already exists on GitHub but the push was
-rejected because the stored token lacks `workflow` scope. Run:
+Useful commands:
 
 ```bash
-gh auth refresh -h github.com -s workflow   # interactive device-code login
-cd ~/Projects/lifeboat && git push -u origin main
+tail -f ~/Projects/lifeboat/ops/logs/watcher.log            # watch it work
+launchctl kickstart gui/$UID/com.austinryan.lifeboat-watcher # force a run now
+launchctl bootout gui/$UID/com.austinryan.lifeboat-watcher   # stop it
 ```
 
-Then confirm the watcher runs: GitHub → repo → Actions → "Lifeboat watcher" →
-**Run workflow**. From then on it runs every 30 minutes and opens a
-`shutdown-alert` issue per detection. (GitHub pauses cron workflows after 60
-days without repo activity — the watcher's own state commits prevent that.)
+## The one revenue-critical step (requires your identity)
 
-## 1. Buy the domain (~$10/yr)
-
-Any registrar (Cloudflare Registrar is at-cost). Name ideas to check:
-`lifeboat.directory`, `softwarelifeboat.com`, `sunkware.com` — anything short
-that reads as "rescue". Nothing else depends on the exact name.
-
-## 2. Deploy the site on Cloudflare Pages (free, ~10 min)
-
-1. Cloudflare dashboard → Workers & Pages → Create → Pages → connect the
-   `lifeboat` GitHub repo.
-2. Settings: root directory `site`, build command `npm run build`,
-   output directory `dist`.
-3. Environment variable: `SITE_URL=https://<your-domain>` (also update the
-   fallback in `site/astro.config.mjs`).
-4. Attach the custom domain.
-
-Every push (including the watcher's automated signal commits) now redeploys
-the site.
-
-## 3. Google Search Console (~10 min, do at launch + per guide)
-
-Add the domain property, verify via the DNS record Cloudflare hosts, submit
-`https://<domain>/rss.xml` as a feed/sitemap, and use **URL Inspection →
-Request Indexing** on each new guide. This is the single highest-leverage
-action per event — it pulls indexing from days down to hours.
-
-## 4. Affiliate programs (do as guides demand)
-
-Current guides use keys `affinity`, `canva`, `adobe`:
+Affiliate programs need a human's name, address, and payout details — this is
+the only thing standing between traffic and money. Current guides use keys
+`affinity`, `canva`, `adobe`:
 
 - **Canva** — canva.com/affiliates
 - **Affinity (Serif)** — affinity.serif.com/affiliates (runs on impact.com)
 - **Adobe** — adobe.com/affiliates
 
-When approved, put the tracked URL in `site/src/data/affiliates.json`:
+When approved, put each tracked URL in `site/src/data/affiliates.json`:
 
 ```json
 { "canva": "https://your-tracked-link", "affinity": "https://..." }
 ```
 
-Commit; links flip from direct to tracked (with the on-page disclosure)
-automatically. For future events, check each alternative vendor's site footer
-for "Affiliates" or "Partners", plus partnerstack.com and impact.com
-marketplaces.
+Commit + push; the next watcher run redeploys and links flip from direct to
+tracked (with the on-page disclosure). Until then the site runs fine with
+honest direct links — it just earns nothing.
 
-## 5. Per-event playbook (the wartime drill, ~2–4 h per event)
+## Per-event playbook (when a shutdown-alert issue arrives)
 
-1. A `shutdown-alert` issue arrives. Apply the go/no-go checklist in the issue.
+1. Apply the go/no-go checklist in the issue.
 2. **GO** → `python3 kit/new_event.py alerts/<slug>.json`
 3. Research with primary sources only; replace every TODO. If the dying tool
-   has a structured export, write a real migration script in a public repo and
-   link it — that's the moat.
-4. Commit + push → site auto-deploys.
-5. Request indexing (step 3 above).
-6. Reply, genuinely helpfully, in the announcement's HN/Reddit threads with
-   the guide link — from your own accounts, your judgment on tone.
-7. Close the issue.
+   has a structured export, write a real migration script in a public repo
+   and link it — that's the moat.
+4. Commit + push; the watcher deploys it within 30 minutes (or kickstart).
+5. Reply, genuinely helpfully, in the announcement's HN/Reddit threads with
+   the guide link — your accounts, your judgment on tone.
+6. Close the issue.
 
-## 6. Optional upgrades
+## Optional upgrades (each helps growth, none required)
 
-- **Email alerts**: add SMTP creds as repo secrets and a `mail` step in
-  `watch.yml` (GitHub notifications on new issues may already be enough —
-  watch the repo and enable mobile/push notifications).
-- **Reddit as a source**: requires a Reddit OAuth app (script type) —
-  unauthenticated JSON is blocked. Worth it; r/selfhosted catches shutdowns
-  early.
-- **Backfill guides**: the signals feed already lists detected events
-  (Supermaven, Fauna, Humanloop…) that can become "sunk" guides for SEO depth.
+- **Custom domain (~$10/yr)**: buy one, point DNS at GitHub Pages, set it in
+  repo Settings → Pages, then update `SITE_URL`/`BASE_PATH` in
+  `ops/run_watcher.sh` (drop the base path) and `site/astro.config.mjs`.
+- **Google Search Console**: verify the site and request indexing per guide —
+  the single biggest accelerator for catching the post-announcement search
+  surge (hours instead of days).
+- **GitHub Actions cron instead of launchd** (runs even when the Mac is off):
+  `gh auth refresh -h github.com -s workflow`, then restore
+  `ops/github-actions-watch.yml.disabled` to `.github/workflows/watch.yml`
+  and push.
+- **Reddit as a source**: needs a Reddit OAuth app; unauthenticated JSON is
+  blocked. r/selfhosted catches shutdowns early.
+- **Backfill guides**: the signals feed lists detected events (Supermaven,
+  Fauna, Humanloop…) that can become "sunk" guides for SEO depth.
