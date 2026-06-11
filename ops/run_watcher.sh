@@ -4,6 +4,9 @@
 # (every 30 min + at load). Logs: ops/logs/watcher.log
 set -uo pipefail
 export PATH="/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:$PATH"
+# nvm-managed node isn't on launchd's PATH; pin the newest installed version.
+NVM_BIN="$(ls -d "$HOME"/.nvm/versions/node/*/bin 2>/dev/null | sort -V | tail -1)"
+[ -n "$NVM_BIN" ] && export PATH="$NVM_BIN:$PATH"
 
 REPO="$HOME/Projects/lifeboat"
 LOCK="$REPO/ops/.run.lock"
