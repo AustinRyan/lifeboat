@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>Lifeboat — survival guides for sinking software</title>
+    <link>https://austinryan.github.io/lifeboat/</link>
+    <description>SaaS shutdown deadlines, export steps, and migration guides.</description>
+    <item>
+      <title>Garnix is shutting down — survival guide</title>
+      <link>https://austinryan.github.io/lifeboat/shutdowns/garnix</link>
+      <guid>https://austinryan.github.io/lifeboat/shutdowns/garnix</guid>
+      <pubDate>Thu, 28 May 2026 00:00:00 GMT</pubDate>
+      <description>Hosted CI and caching for Nix projects — flake checks, multi-arch builds, deploy previews</description>
+    </item>
+    <item>
+      <title>Microsoft Publisher is shutting down — survival guide</title>
+      <link>https://austinryan.github.io/lifeboat/shutdowns/microsoft-publisher</link>
+      <guid>https://austinryan.github.io/lifeboat/shutdowns/microsoft-publisher</guid>
+      <pubDate>Thu, 15 Feb 2024 00:00:00 GMT</pubDate>
+      <description>Microsoft's desktop-publishing app for flyers, newsletters, and bulletins since 1991</description>
+    </item>
+  </channel>
+</rss>

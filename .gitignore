@@ -1,0 +1,8 @@
+node_modules/
+dist/
+.astro/
+__pycache__/
+.DS_Store
+ops/logs/
+ops/.run.lock/
+ops/.last-deploy
