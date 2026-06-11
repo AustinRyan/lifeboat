@@ -1,0 +1,17 @@
+{
+  "slug": "hn-47645035",
+  "title": "Microsoft Discontinuing Publisher. Alternatives?",
+  "url": "https://news.ycombinator.com/item?id=47645035",
+  "source": "hn",
+  "score": 76,
+  "breakdown": {
+    "language": 60,
+    "engagement": 16,
+    "negatives": 0
+  },
+  "created_utc": 1775349740,
+  "body": "Got this in the email not too long ago:<p>Beginning 1 October 2026, Microsoft Publisher will no longer be supported as part of Microsoft 365. Many common Publisher scenarios are available in other Microsoft 365 apps, including Microsoft Word and PowerPoint.<p>Action Recommended: Before 1 October 2026, convert your existing Publisher files to PDF or Word format. After this date, you will no longer be able to open or edit these files with Microsoft Publisher.<p>This company is wild.<p>Where do we go from here? Affinity? InDesign? Quark? Scribus?",
+  "extra": {
+    "hn_link": "https://news.ycombinator.com/item?id=47645035"
+  }
+}

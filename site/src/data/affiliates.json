@@ -1,0 +1,3 @@
+{
+  "_comment": "Map affiliateKey -> tracked URL. Keys starting with _ are ignored. Until a vendor key exists here, pages render the vendor's direct URL — never a placeholder."
+}

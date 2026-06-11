@@ -1,0 +1,17 @@
+{
+  "slug": "hn-48309371",
+  "title": "Garnix, the Nix CI, is shutting down",
+  "url": "https://news.ycombinator.com/item?id=48309371",
+  "source": "hn",
+  "score": 72,
+  "breakdown": {
+    "language": 60,
+    "engagement": 12,
+    "negatives": 0
+  },
+  "created_utc": 1779978213,
+  "body": "Text from the email:<p>garnix is shutting down<p>Hi everyone,<p>We wanted to let you know that garnix is joining forces with Shopify.<p>We are sad to announce that, as part of this transition, the hosted garnix service will shut down on July 15th 2026. But we are open sourcing the garnix codebase, available here (https:&#x2F;&#x2F;github.com&#x2F;garnix-io&#x2F;garnix-ci); we hope this will help you smoothly move to using your own instance or a shared one. If you are interested in operating a public community instance, please get in touch \u2014 we\u2019d be happy to talk.<p>We will also be deleting all user data on July 15th. This includes build artifacts. Be sure to download what you want to keep before then.<p>Thank you all for using garnix and for the feedback and support over the years. While we are excited about our next step at Shopify, we will also miss working with this community. From the very first, with generous donations in our Open Collective days and thoughtful feedback, you&#x27;",
+  "extra": {
+    "hn_link": "https://news.ycombinator.com/item?id=48309371"
+  }
+}

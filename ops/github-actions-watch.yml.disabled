@@ -1,0 +1,57 @@
+name: Lifeboat watcher
+
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: lifeboat-watcher
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run watcher
+        working-directory: watcher
+        run: python3 -m lifeboat_watcher.run --out ../alerts --state state/seen.json
+
+      - name: Update public signals feed
+        run: python3 kit/update_signals.py
+
+      - name: Ensure alert label exists
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh label create shutdown-alert --color D93F0B \
+            --description "Detected SaaS shutdown announcement" \
+            --repo "$GITHUB_REPOSITORY" 2>/dev/null || true
+
+      - name: Open issues for new alerts
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          shopt -s nullglob
+          for f in alerts/*.md; do
+            slug="$(basename "$f" .md)"
+            title="$(python3 -c "import json;print(json.load(open('alerts/$slug.json'))['title'][:200])")"
+            gh issue create --repo "$GITHUB_REPOSITORY" \
+              --title "🛟 $title" \
+              --body-file "$f" \
+              --label shutdown-alert
+          done
+
+      - name: Commit updated state and alerts
+        run: |
+          git config user.name "lifeboat-watcher"
+          git config user.email "actions@users.noreply.github.com"
+          git add watcher/state/seen.json alerts/ site/src/data/signals.json 2>/dev/null || true
+          git diff --cached --quiet || git commit -m "watcher: update seen state and alerts [skip ci]"
+          git push

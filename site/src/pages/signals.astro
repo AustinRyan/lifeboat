@@ -1,0 +1,32 @@
+---
+import Base from '../layouts/Base.astro';
+import signals from '../data/signals.json';
+
+const sorted = [...signals].sort((a, b) => b.created_utc - a.created_utc);
+---
+
+<Base
+  title="Distress signals — automated shutdown detections | Lifeboat"
+  description="Raw, automated detections of possible software shutdowns from Hacker News and news feeds, scored by our watcher. Unverified until a survival guide ships."
+>
+  <div class="hero" style="padding-bottom:1.6rem">
+    <h1 class="rise">Distress <em>signals</em></h1>
+    <p class="lede rise d1">
+      Everything our watcher heard on the radio, newest first. These are <strong>automated,
+      unverified detections</strong> — scores reflect shutdown-shaped language and engagement, not
+      editorial judgment. Confirmed wrecks get a full survival guide on the front page.
+    </p>
+  </div>
+
+  <table class="signals rise d2">
+    <tbody>
+      {sorted.map((s) => (
+        <tr>
+          <td class="score">{s.score}</td>
+          <td><a href={s.url} rel="noopener">{s.title}</a></td>
+          <td class="src">{s.source}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</Base>

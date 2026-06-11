@@ -1,0 +1,90 @@
+---
+import { getCollection, render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import { resolveLink } from '../../lib/links';
+import { fmtDate, daysUntil } from '../../lib/format';
+
+export async function getStaticPaths() {
+  const events = await getCollection('events');
+  return events.map((event) => ({ params: { slug: event.id }, props: { event } }));
+}
+
+const { event } = Astro.props;
+const { Content } = await render(event);
+const d = event.data;
+const daysLeft = d.deadline ? daysUntil(d.deadline) : null;
+const resolved = d.alternatives.map((alt) => ({ ...alt, link: resolveLink(alt.url, alt.affiliateKey) }));
+const anySponsored = resolved.some((alt) => alt.link.sponsored);
+---
+
+<Base
+  title={`${d.product} is shutting down — what to do | Lifeboat`}
+  description={`${d.product} shutdown: deadline, how to export your data, and the best alternatives. ${d.tagline}`}
+>
+  <article>
+    <div class="hero" style="padding-bottom:1rem">
+      <p class="mono rise" style="color:var(--orange-deep)">
+        DISTRESS RECORD · ANNOUNCED {fmtDate(d.announced).toUpperCase()}
+      </p>
+      <h1 class="rise d1">{d.product} <em>is going down</em></h1>
+      <p class="lede rise d2">{d.tagline}</p>
+    </div>
+
+    <div class="factbox rise d3">
+      <dl>
+        <dt>Status</dt>
+        <dd><span class={`badge ${d.status}`}>{d.status === 'sinking' ? 'Sinking' : 'Sunk'}</span></dd>
+        <dt>Service ends</dt>
+        <dd>
+          <strong>{fmtDate(d.deadline)}</strong>
+          {daysLeft !== null && daysLeft >= 0 && (
+            <div class="countdown">{daysLeft} {daysLeft === 1 ? 'day' : 'days'} left</div>
+          )}
+          {daysLeft !== null && daysLeft < 0 && <span class="mono"> (service is offline)</span>}
+        </dd>
+        <dt>Announcement</dt>
+        <dd><a href={d.sourceUrl} rel="noopener">primary source ↗</a></dd>
+        {d.exportUrl && (
+          <>
+            <dt>Export data</dt>
+            <dd><a href={d.exportUrl} rel="noopener">{d.exportUrl} ↗</a></dd>
+          </>
+        )}
+      </dl>
+    </div>
+
+    <section>
+      <div class="section-head"><h2><span class="tick">▸</span> Ships still afloat</h2></div>
+      <table class="alts">
+        <thead>
+          <tr><th>Alternative</th><th>Why this one</th><th></th></tr>
+        </thead>
+        <tbody>
+          {resolved.map((alt) => (
+            <tr>
+              <td class="name">{alt.name}</td>
+              <td>{alt.pitch}</td>
+              <td>
+                <a
+                  class="go"
+                  href={alt.link.href}
+                  rel={alt.link.sponsored ? 'sponsored noopener' : 'noopener'}
+                >Board ↗</a>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      {anySponsored && (
+        <p class="disclosure">
+          Marked links are affiliate links — we may earn a commission at no cost to you. They never
+          change our ranking.
+        </p>
+      )}
+    </section>
+
+    <section class="guide-body">
+      <Content />
+    </section>
+  </article>
+</Base>
