@@ -1,5 +1,13 @@
 [
   {
+    "slug": "hn-49176920",
+    "title": "Flowise Is Shutting Down",
+    "url": "https://flowiseai.com/sunset",
+    "source": "hn",
+    "score": 70,
+    "created_utc": 1785888160
+  },
+  {
     "slug": "hn-48317043",
     "title": "Garnix (A Nix CI) is shutting down",
     "url": "https://discourse.nixos.org/t/garnix-is-shutting-down-not-oc/77895",
